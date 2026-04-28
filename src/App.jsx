@@ -1,49 +1,52 @@
-
-import React, { useState } from 'react';
-import ProductList from './ProductList';
-import './App.css';
-import AboutUs from './AboutUs';
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import ProductList from "./components/ProductList";
+import CartItem from "./components/CartItem";
+import "./App.css";
 
 function App() {
-  
-  const [showProductList, setShowProductList] = useState(false);
+  const [currentPage, setCurrentPage] = useState("home");
+  const cartItems = useSelector((state) => state.cart.items);
 
-  const handleGetStartedClick = () => {
-    setShowProductList(true);
-  };
-
-  const handleHomeClick = () => {
-    setShowProductList(false);
+  const calculateTotalQuantity = () => {
+    return cartItems.reduce((total, item) => total + item.quantity, 0);
   };
 
   return (
-    <div className="app-container">
-      <div className={`landing-page ${showProductList ? 'fade-out' : ''}`}>
-        <div className="background-image"></div>
-        <div className="content">
-         <div className="landing_content">
-         <h1>Welcome To Paradise Nursery</h1>
-          <div className="divider"></div>
-          <p>Where Green Meets Serenity</p>
-         
-          <button className="get-started-button" onClick={handleGetStartedClick}>
-            Get Started
-          </button>
-         </div>
-          <div className="aboutus_container">
-          <AboutUs/>
-          </div>
-          </div>
+    <div>
+      <nav className="navbar">
+        <h2 onClick={() => setCurrentPage("home")}>Paradise Nursery</h2>
 
-      </div>
-      <div className={`product-list-container ${showProductList ? 'visible' : ''}`}>
-        <ProductList onHomeClick={handleHomeClick}/>
-      </div>
+        <div className="nav-links">
+          <button onClick={() => setCurrentPage("home")}>Home</button>
+          <button onClick={() => setCurrentPage("plants")}>Plants</button>
+          <button onClick={() => setCurrentPage("cart")}>
+            🛒 Cart ({calculateTotalQuantity()})
+          </button>
+        </div>
+      </nav>
+
+      {currentPage === "home" && (
+        <div className="landing-page">
+          <div className="landing-content">
+            <h1>Paradise Nursery</h1>
+            <p>
+              Welcome to Paradise Nursery, your online plant shop for beautiful,
+              healthy houseplants. We offer aromatic, medicinal, and air-purifying
+              plants to make your home greener and more peaceful.
+            </p>
+            <button onClick={() => setCurrentPage("plants")}>Get Started</button>
+          </div>
+        </div>
+      )}
+
+      {currentPage === "plants" && <ProductList />}
+
+      {currentPage === "cart" && (
+        <CartItem onContinueShopping={() => setCurrentPage("plants")} />
+      )}
     </div>
   );
 }
 
 export default App;
-
-
-
